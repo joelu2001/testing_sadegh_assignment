@@ -308,13 +308,16 @@ def compute(inputs):
     first_E = _get(inputs, "20", "E")
     phi_12 = _get(inputs, "21", "bearing")
 
-    beta_measured = [_get(inputs, p, "measured_angle") for p in POINTS]
+    ANGLE_POINTS = ["21", "22", "23", "24", "20"]
+
+    beta_measured = [_get(inputs, p, "measured_angle") for p in ANGLE_POINTS]
     lengths = [_get(inputs, p, "side_length") for p in POINTS]
 
     if any(v is None for v in [first_N, first_E, phi_12] + beta_measured + lengths):
         return {}
 
     beta_adj, f_beta = adjust_angles(beta_measured)
+	beta_adj_by_point = dict(zip(ANGLE_POINTS, beta_adj))
     bearings = compute_bearings(phi_12, beta_adj)
     dN, dE = compute_increments(lengths, bearings)
     fN, fE, fR = compute_coordinate_errors(dN, dE)
@@ -340,7 +343,7 @@ def compute(inputs):
             "E": coords[i][1],
             "wrong_in_N": cor_N[i],
             "wrong_in_E": cor_E[i],
-            "wrong_in_angle": beta_adj[i],
+            "wrong_in_angle": beta_adj_by_point[p],
         }
 
     results["_global"] = {
