@@ -331,31 +331,25 @@ def compute(inputs):
     phi_12 = _get(inputs, "21", "bearing")
 
     ANGLE_POINTS = ["21", "22", "23", "24", "20"]
+    beta = [_get(inputs, p, "measured_angle") for p in ANGLE_POINTS]
+    L = [_get(inputs, p, "side_length") for p in POINTS]
 
-    beta_measured = [_get(inputs, p, "measured_angle") for p in ANGLE_POINTS]
-    lengths = [_get(inputs, p, "side_length") for p in POINTS]
-
-    if any(v is None for v in [first_N, first_E, phi_12] + beta_measured + lengths):
+    if any(v is None for v in [first_N, first_E, phi_12] + beta + L):
         return {}
 
-    angles = [[0.0, 0.0, 0.0, b] for b in beta_measured]
+    angles_struct = [[0.0, 0.0, 0.0, b] for b in beta]
+    lengths_struct = [[0.0, 0.0, l] for l in L]
 
-    beta_adj = adjust_angles(angles)
+    f_beta = 400.0 - sum(beta)
+    d_beta = f_beta / 5.0
 
-    f_beta = 400.0 - sum(beta_measured)
+    adjusted_angles = adjust_angles(angles_struct)
 
-    wrong_in_angle_by_point = {
-        p: (beta_adj[i] - beta_measured[i]) for i, p in enumerate(ANGLE_POINTS)
-    }
-
-    bearings = compute_bearings(phi_12, beta_adj)
-
-    dN, dE = compute_increments([[0.0, 0.0, L] for L in lengths], bearings)
+    bearings = compute_bearings(phi_12, adjusted_angles)
+    dN, dE = compute_increments(lengths_struct, bearings)
 
     fN, fE, fR = compute_coordinate_errors(dN, dE)
-
-    cor_N, cor_E, total_L = compute_Bowditch(fN, fE, [[0.0, 0.0, L] for L in lengths])
-
+    cor_N, cor_E, total_L = compute_Bowditch(fN, fE, lengths_struct)
     coords = compute_coordinates(first_N, first_E, dN, dE, cor_N, cor_E)
 
     bearing_incoming = {
@@ -398,6 +392,9 @@ def compute(inputs):
         "20": cor_E[4],
     }
 
+    beta_by_point = dict(zip(ANGLE_POINTS, beta))
+    wrong_in_angle_by_point = {p: d_beta for p in ANGLE_POINTS}
+
     coord_by_point = {
         "20": (coords[0][0], coords[0][1]),
         "21": (coords[1][0], coords[1][1]),
@@ -407,7 +404,6 @@ def compute(inputs):
     }
 
     results = {}
-
     for p in POINTS:
         results[p] = {
             "dN": dN_incoming[p],
