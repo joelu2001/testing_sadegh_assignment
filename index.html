@@ -317,7 +317,8 @@ def compute(inputs):
         return {}
 
     beta_adj, f_beta = adjust_angles(beta_measured)
-	beta_adj_by_point = dict(zip(ANGLE_POINTS, beta_adj))
+    beta_adj_by_point = dict(zip(ANGLE_POINTS, beta_adj))
+
     bearings = compute_bearings(phi_12, beta_adj)
     dN, dE = compute_increments(lengths, bearings)
     fN, fE, fR = compute_coordinate_errors(dN, dE)
@@ -355,7 +356,6 @@ def compute(inputs):
     }
 
     return results
-
 `);
 
       statusEl.textContent = "Ready.";
