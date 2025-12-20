@@ -405,7 +405,7 @@ def compute(inputs):
 	async function doPlot() {
 	  try {
 		plotBtn.disabled = true;
-		statusEl.textContent = "Plotting…";
+		statusEl.textContent = "Computing + plotting…";
 
 		const inputs = collectInputs();
 
@@ -415,17 +415,36 @@ def compute(inputs):
 		clearOutputs();
 		fillOutputs(results);
 
-		// ... keep your plotting code here if you already have it ...
+		// Build plot coordinates from computed results
+		const order = ["20", "21", "22", "23", "24", "20"]; // close traverse
+		const xs = [];
+		const ys = [];
+
+		for (const p of order) {
+		  const pt = results?.[p];
+		  if (!pt || pt.E === undefined || pt.N === undefined || pt.E === null || pt.N === null) {
+			throw new Error(`Missing computed N/E for point ${p}.`);
+		  }
+		  xs.push(Number(pt.E)); // x = Easting
+		  ys.push(Number(pt.N)); // y = Northing
+		}
+
+		// Plot using your existing python helper
+		pyodide.globals.set("xs_js", pyodide.toPy(xs));
+		pyodide.globals.set("ys_js", pyodide.toPy(ys));
+		const b64 = pyodide.runPython("plot_xy_to_base64(xs_js, ys_js)");
+
+		plotEl.innerHTML = `<img alt="Traverse plot" src="data:image/png;base64,${b64}">`;
 
 		statusEl.textContent = "Done.";
 	  } catch (err) {
 		statusEl.textContent = "Error.";
-		plotEl.innerHTML = `<div class="hint" style="color:#b00020;">${err.message}</div>`;
+		plotEl.innerHTML = `<div class="hint" style="color:#b00020;">${err.message || err}</div>`;
 	  } finally {
 		plotBtn.disabled = false;
 	  }
 	}
-	
+
 	function collectInputs() {
 	  const inputs = {};
 	  document.querySelectorAll('#dataTable input[data-in]').forEach(el => {
