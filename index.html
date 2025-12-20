@@ -283,11 +283,11 @@ def _get(inputs, point, key):
     v = (inputs.get(point, {}) or {}).get(key, None)
     return float(v) if v is not None else None
 
-def adjust_angles(beta_measured):
-    f_beta = 400.0 - sum(beta_measured)
-    d_beta = f_beta / 5.0
-    beta_adj = [b + d_beta + 200.0 for b in beta_measured]
-    return beta_adj, f_beta
+def adjust_angles(angles):
+    β = [a[3] for a in angles]
+    fβ = 400 - sum(β)
+    dβ = fβ / 5
+    return [βi + dβ + 200 for βi in β]
 
 def compute_bearings(phi_12, adjusted_angles):
     phi = [0.0] * 5
@@ -338,7 +338,12 @@ def compute(inputs):
     if any(v is None for v in [first_N, first_E, phi_12] + beta_measured + lengths):
         return {}
 
-    beta_adj, f_beta = adjust_angles(beta_measured)
+    angles = [[None, None, None, b] for b in beta_measured]
+    beta_adj = adjust_angles(angles)
+
+    f_beta = 400.0 - sum(beta_measured)
+    d_beta = f_beta / 5.0
+
     beta_adj_by_point = dict(zip(ANGLE_POINTS, beta_adj))
 
     bearings = compute_bearings(phi_12, beta_adj)
@@ -347,45 +352,11 @@ def compute(inputs):
     cor_N, cor_E, total_L = compute_Bowditch(fN, fE, lengths)
     coords = compute_coordinates(first_N, first_E, dN, dE, cor_N, cor_E)
 
-    bearing_incoming = {
-        "21": bearings[0],
-        "22": bearings[1],
-        "23": bearings[2],
-        "24": bearings[3],
-        "20": bearings[4],
-    }
-
-    dN_incoming = {
-        "21": dN[0],
-        "22": dN[1],
-        "23": dN[2],
-        "24": dN[3],
-        "20": dN[4],
-    }
-
-    dE_incoming = {
-        "21": dE[0],
-        "22": dE[1],
-        "23": dE[2],
-        "24": dE[3],
-        "20": dE[4],
-    }
-
-    corN_incoming = {
-        "21": cor_N[0],
-        "22": cor_N[1],
-        "23": cor_N[2],
-        "24": cor_N[3],
-        "20": cor_N[4],
-    }
-
-    corE_incoming = {
-        "21": cor_E[0],
-        "22": cor_E[1],
-        "23": cor_E[2],
-        "24": cor_E[3],
-        "20": cor_E[4],
-    }
+    bearing_incoming = {"21": bearings[0], "22": bearings[1], "23": bearings[2], "24": bearings[3], "20": bearings[4]}
+    dN_incoming = {"21": dN[0], "22": dN[1], "23": dN[2], "24": dN[3], "20": dN[4]}
+    dE_incoming = {"21": dE[0], "22": dE[1], "23": dE[2], "24": dE[3], "20": dE[4]}
+    corN_incoming = {"21": cor_N[0], "22": cor_N[1], "23": cor_N[2], "24": cor_N[3], "20": cor_N[4]}
+    corE_incoming = {"21": cor_E[0], "22": cor_E[1], "23": cor_E[2], "24": cor_E[3], "20": cor_E[4]}
 
     coord_by_point = {
         "20": (coords[0][0], coords[0][1]),
@@ -396,7 +367,6 @@ def compute(inputs):
     }
 
     results = {}
-
     for p in POINTS:
         results[p] = {
             "dN": dN_incoming[p],
@@ -406,7 +376,7 @@ def compute(inputs):
             "E": coord_by_point[p][1],
             "wrong_in_N": corN_incoming[p],
             "wrong_in_E": corE_incoming[p],
-            "wrong_in_angle": beta_adj_by_point[p],
+            "wrong_in_angle": d_beta,
         }
 
     results["_global"] = {
