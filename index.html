@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Split Table + Plot</title>
+  <title>Split Table + Matplotlib (Pyodide)</title>
   <style>
     body { margin: 0; font-family: system-ui, Arial, sans-serif; }
     .wrap { display: flex; height: 100vh; }
@@ -12,9 +12,12 @@
     table { border-collapse: collapse; width: 100%; }
     th, td { border: 1px solid #ccc; padding: 6px; }
     input { width: 100%; box-sizing: border-box; }
-    .row { display: flex; gap: 8px; margin: 8px 0; }
+    .row { display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap; align-items: center; }
     button { padding: 8px 12px; }
-    #plot { border: 1px solid #ddd; padding: 8px; min-height: 360px; }
+    #status { font-size: 0.9rem; opacity: 0.85; }
+    #plot { border: 1px solid #ddd; padding: 8px; min-height: 360px; display: grid; place-items: center; }
+    #plot img { max-width: 100%; height: auto; display: block; }
+    .hint { font-size: 0.9rem; opacity: 0.8; }
   </style>
 </head>
 <body>
@@ -24,8 +27,13 @@
 
       <div class="row">
         <button id="addRow">Add row</button>
-        <button id="plotBtn">Plot</button>
+        <button id="plotBtn" disabled>Plot</button>
+        <span id="status">Loading Python…</span>
       </div>
+
+      <p class="hint">
+        Enter numeric x/y values. The plot will draw points and connect them in row order.
+      </p>
 
       <table id="dataTable">
         <thead>
@@ -41,20 +49,114 @@
 
     <div class="right">
       <h2>Plot</h2>
-      <div id="plot">Plot will appear here.</div>
+      <div id="plot"><div class="hint">Matplotlib plot will appear here.</div></div>
     </div>
   </div>
 
+  <!-- Pyodide (official CDN, pinned version) -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
+
   <script>
     const tbody = document.querySelector("#dataTable tbody");
+    const plotBtn = document.getElementById("plotBtn");
+    const statusEl = document.getElementById("status");
+    const plotEl = document.getElementById("plot");
+
     document.getElementById("addRow").addEventListener("click", () => {
       const tr = document.createElement("tr");
       tr.innerHTML = `<td><input value="0"></td><td><input value="0"></td>`;
       tbody.appendChild(tr);
     });
 
-    document.getElementById("plotBtn").addEventListener("click", () => {
-      document.getElementById("plot").textContent = "Next step: run Python (Pyodide) and draw with Matplotlib.";
+    function readTableXY() {
+      const rows = [...tbody.querySelectorAll("tr")];
+      const xs = [];
+      const ys = [];
+
+      for (const row of rows) {
+        const inputs = row.querySelectorAll("input");
+        const x = Number(inputs[0].value);
+        const y = Number(inputs[1].value);
+
+        if (!Number.isFinite(x) || !Number.isFinite(y)) {
+          throw new Error("All table cells must be valid numbers.");
+        }
+        xs.push(x);
+        ys.push(y);
+      }
+      if (xs.length < 1) throw new Error("Add at least one row.");
+      return { xs, ys };
+    }
+
+    let pyodide = null;
+
+    async function initPyodideAndPackages() {
+      statusEl.textContent = "Loading Python runtime…";
+      pyodide = await loadPyodide({
+        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.29.0/full/"
+      });
+
+      statusEl.textContent = "Loading matplotlib + numpy…";
+      await pyodide.loadPackage(["numpy", "matplotlib"]);
+
+      // Define a Python helper that returns a base64 PNG string.
+      pyodide.runPython(`
+import base64
+from io import BytesIO
+
+import matplotlib
+matplotlib.use("Agg")  # render offscreen to PNG
+
+import matplotlib.pyplot as plt
+
+def plot_xy_to_base64(xs, ys):
+    fig, ax = plt.subplots(figsize=(6.5, 4.0), dpi=150)
+    ax.plot(xs, ys, marker="o", linestyle="-")
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.grid(True)
+
+    buf = BytesIO()
+    fig.tight_layout()
+    fig.savefig(buf, format="png")
+    plt.close(fig)
+    buf.seek(0)
+    return base64.b64encode(buf.read()).decode("utf-8")
+      `);
+
+      statusEl.textContent = "Ready.";
+      plotBtn.disabled = false;
+    }
+
+    async function doPlot() {
+      try {
+        plotBtn.disabled = true;
+        statusEl.textContent = "Plotting…";
+
+        const { xs, ys } = readTableXY();
+
+        // Pass JS arrays to Python
+        pyodide.globals.set("xs_js", pyodide.toPy(xs));
+        pyodide.globals.set("ys_js", pyodide.toPy(ys));
+
+        const b64 = pyodide.runPython(`plot_xy_to_base64(xs_js, ys_js)`);
+
+        plotEl.innerHTML = `<img alt="matplotlib plot" src="data:image/png;base64,${b64}">`;
+        statusEl.textContent = "Done.";
+      } catch (err) {
+        plotEl.innerHTML = `<div class="hint" style="color: #b00020;">${err.message}</div>`;
+        statusEl.textContent = "Error.";
+      } finally {
+        plotBtn.disabled = false;
+      }
+    }
+
+    plotBtn.addEventListener("click", doPlot);
+
+    // Kick off initialization
+    initPyodideAndPackages().catch((err) => {
+      statusEl.textContent = "Failed to load Python.";
+      plotEl.innerHTML = `<div class="hint" style="color: #b00020;">${err.message}</div>`;
     });
   </script>
 </body>
