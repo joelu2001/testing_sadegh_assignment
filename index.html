@@ -348,22 +348,57 @@ def compute(inputs):
         p: adjusted_angles[i] - beta_measured[i]
         for i, p in enumerate(ANGLE_POINTS)
     }
-	
-	f_beta = 0
-	for i in wrong_in_angle_by_point.values():
+
+    f_beta = 0
+    for i in wrong_in_angle_by_point.values():
         f_beta += i
 
     bearings = compute_bearings(phi_12, adjusted_angles)
     dN, dE = compute_increments(lengths, bearings)
+
     fN, fE, fR = compute_coordinate_errors(dN, dE)
     cor_N, cor_E, total_L = compute_Bowditch(fN, fE, lengths)
     coords = compute_coordinates(first_N, first_E, dN, dE, cor_N, cor_E)
 
-    bearing_incoming = {"21": bearings[0], "22": bearings[1], "23": bearings[2], "24": bearings[3], "20": bearings[4]}
-    dN_incoming = {"21": dN[0], "22": dN[1], "23": dN[2], "24": dN[3], "20": dN[4]}
-    dE_incoming = {"21": dE[0], "22": dE[1], "23": dE[2], "24": dE[3], "20": dE[4]}
-    corN_incoming = {"21": cor_N[0], "22": cor_N[1], "23": cor_N[2], "24": cor_N[3], "20": cor_N[4]}
-    corE_incoming = {"21": cor_E[0], "22": cor_E[1], "23": cor_E[2], "24": cor_E[3], "20": cor_E[4]}
+    bearing_incoming = {
+        "21": bearings[0],
+        "22": bearings[1],
+        "23": bearings[2],
+        "24": bearings[3],
+        "20": bearings[4],
+    }
+
+    dN_incoming = {
+        "21": dN[0],
+        "22": dN[1],
+        "23": dN[2],
+        "24": dN[3],
+        "20": dN[4],
+    }
+
+    dE_incoming = {
+        "21": dE[0],
+        "22": dE[1],
+        "23": dE[2],
+        "24": dE[3],
+        "20": dE[4],
+    }
+
+    corN_incoming = {
+        "21": cor_N[0],
+        "22": cor_N[1],
+        "23": cor_N[2],
+        "24": cor_N[3],
+        "20": cor_N[4],
+    }
+
+    corE_incoming = {
+        "21": cor_E[0],
+        "22": cor_E[1],
+        "23": cor_E[2],
+        "24": cor_E[3],
+        "20": cor_E[4],
+    }
 
     coord_by_point = {
         "20": (coords[0][0], coords[0][1]),
