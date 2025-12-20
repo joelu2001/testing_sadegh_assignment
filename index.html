@@ -4,50 +4,51 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Traverse Assignment</title>
-  <style>
-    body { margin: 0; font-family: system-ui, Arial, sans-serif; }
-    .wrap { display: flex; height: 100vh; }
-    .left { width: 50%; padding: 12px; border-right: 1px solid #ddd; box-sizing: border-box; overflow: auto; }
-    .right { width: 50%; padding: 12px; box-sizing: border-box; overflow: auto; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ccc; padding: 6px; }
-    input { width: 100%; box-sizing: border-box; }
-    .row { display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap; align-items: center; }
-    button { padding: 8px 12px; }
-    #status { font-size: 0.9rem; opacity: 0.85; }
-    #plot { border: 1px solid #ddd; padding: 8px; min-height: 360px; display: grid; place-items: center; }
-    #plot img { max-width: 100%; height: auto; display: block; }
-    .hint { font-size: 0.9rem; opacity: 0.8; }
-	
-	body {background-color: #121212;color: #e0e0e0;}
-	.left,
-	.right {background-color: #1e1e1e;}
-	.left {border-right: 1px solid #333;}
-	table th, table td {border-color: #333;}
-	input {background-color: #2a2a2a;color: #e0e0e0;border: 1px solid #444;}
-	button {background-color: #333;color: #e0e0e0;border: 1px solid #555;cursor: pointer;}
+<style>
+  body {margin:0;font-family:system-ui,Arial,sans-serif;background-color:#121212;color:#e0e0e0;}
+  .wrap {display:flex;height:100vh;}
+  .left {width:50%;padding:12px;border-right:1px solid #333;box-sizing:border-box;overflow:auto;background-color:#1e1e1e;}
+  .right {width:50%;padding:12px;box-sizing:border-box;overflow:auto;background-color:#1e1e1e;}
 
-	button:hover {background-color: #444;}
-	#plot {background-color: #181818; border-color: #333;}
-	.hint, #status {opacity: 0.9;}
+  table {width:100%;}
+  th,td {padding:6px;}
+  input {width:100%;box-sizing:border-box;background-color:#2a2a2a;color:#e0e0e0;border:1px solid #444;}
+  button {padding:8px 12px;background-color:#333;color:#e0e0e0;border:1px solid #555;cursor:pointer;}
+  button:hover {background-color:#444;}
+  .row {display:flex;gap:8px;margin:8px 0;flex-wrap:wrap;align-items:center;}
+  #status {font-size:0.9rem;opacity:0.9;}
+  #plot {border:1px solid #333;background-color:#181818;padding:8px;min-height:360px;display:grid;place-items:center;}
+  #plot img {max-width:100%;height:auto;display:block;}
+  .hint {font-size:0.9rem;opacity:0.9;}
+  
+  #dataTable{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;}
+  #dataTable th,#dataTable td{
+    padding:8px;
+    vertical-align:middle;
+    text-align:center;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    border:1px solid rgba(255,255,255,0.28);
+  }
 
-	#dataTable td:first-child {font-weight: 500;white-space: nowrap;}
-	#dataTable td:last-child {opacity: 0.8;text-align: center;}
+  #dataTable th{font-size:0.8rem;}
+  #dataTable td{font-size:0.85rem;}
+  #dataTable tbody tr{height:30px;}
+
+  #dataTable input[type="number"]{
+    width:100%;
+    box-sizing:border-box;
+    height:2.2em;
+    line-height:2.2em;
+    text-align:center;}
 	
-	#dataTable{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;}
-	#dataTable th,#dataTable td{padding:8px;vertical-align:middle;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:1px solid #ccc;}
-	#dataTable input[type="number"]{width:100%;box-sizing:border-box;height:2.2em;line-height:2.2em;text-align:center;}
-	#dataTable tbody tr{height:30px;}
-	#dataTable th{font-size:0.8rem;}
-	#dataTable td{font-size:0.85rem;}
-	
-	#dataTable .bg-blue{background:rgba(59,130,246,0.18);}
-	#dataTable .bg-green{background:rgba(34,197,94,0.18);} 
-	#dataTable .bg-blue,#dataTable .bg-green{border-color:rgba(255,255,255,0.10);}
-	#dataTable td.bg-blue input,#dataTable td.bg-green input{background:transparent;}
-	#dataTable .bg-blue{background:rgba(59,130,246,0.18);background-clip:padding-box;}
-	#dataTable .bg-green{background:rgba(34,197,94,0.18);background-clip:padding-box;}
-  </style>
+  #dataTable td:first-child{font-weight:500;white-space:nowrap;}
+  #dataTable .bg-blue{background:rgba(59,130,246,0.18);background-clip:padding-box;}
+  #dataTable .bg-green{background:rgba(34,197,94,0.18);background-clip:padding-box;}
+  #dataTable td.bg-blue input,#dataTable td.bg-green input{background:transparent;}
+</style>
+
 </head>
 <body>
   <div class="wrap">
