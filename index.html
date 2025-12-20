@@ -343,7 +343,12 @@ def compute(inputs):
     lengths = leg_lengths
 
     adjusted_angles, f_beta, d_beta = adjust_angles(angles)
-    wrong_in_angle_by_point = {p: d_beta for p in ANGLE_POINTS}
+
+    wrong_in_angle_by_point = {
+        p: adjusted_angles[i] - beta_measured[i]
+        for i, p in enumerate(ANGLE_POINTS)
+    }
+
 
     bearings = compute_bearings(phi_12, adjusted_angles)
     dN, dE = compute_increments(lengths, bearings)
