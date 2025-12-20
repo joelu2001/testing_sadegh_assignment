@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Split Table + Plot</title>
+  <style>
+    body { margin: 0; font-family: system-ui, Arial, sans-serif; }
+    .wrap { display: flex; height: 100vh; }
+    .left { width: 40%; padding: 12px; border-right: 1px solid #ddd; box-sizing: border-box; overflow: auto; }
+    .right { width: 60%; padding: 12px; box-sizing: border-box; overflow: auto; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 6px; }
+    input { width: 100%; box-sizing: border-box; }
+    .row { display: flex; gap: 8px; margin: 8px 0; }
+    button { padding: 8px 12px; }
+    #plot { border: 1px solid #ddd; padding: 8px; min-height: 360px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="left">
+      <h2>Inputs</h2>
+
+      <div class="row">
+        <button id="addRow">Add row</button>
+        <button id="plotBtn">Plot</button>
+      </div>
+
+      <table id="dataTable">
+        <thead>
+          <tr><th>x</th><th>y</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><input value="0"></td><td><input value="0"></td></tr>
+          <tr><td><input value="1"></td><td><input value="1"></td></tr>
+          <tr><td><input value="2"></td><td><input value="0"></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="right">
+      <h2>Plot</h2>
+      <div id="plot">Plot will appear here.</div>
+    </div>
+  </div>
+
+  <script>
+    const tbody = document.querySelector("#dataTable tbody");
+    document.getElementById("addRow").addEventListener("click", () => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td><input value="0"></td><td><input value="0"></td>`;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById("plotBtn").addEventListener("click", () => {
+      document.getElementById("plot").textContent = "Next step: run Python (Pyodide) and draw with Matplotlib.";
+    });
+  </script>
+</body>
+</html>
