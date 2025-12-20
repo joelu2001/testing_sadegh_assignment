@@ -321,13 +321,13 @@ def compute(inputs):
     cor_N, cor_E, total_L = compute_Bowditch(fN, fE, lengths)
     coords = compute_coordinates(first_N, first_E, dN, dE, cor_N, cor_E)
 
-	bearing_incoming = {
-		"21": bearings[0],
-		"22": bearings[1],
-		"23": bearings[2],
-		"24": bearings[3],
-		"20": bearings[4],
-	}
+    bearing_incoming = {
+        "21": bearings[0],
+        "22": bearings[1],
+        "23": bearings[2],
+        "24": bearings[3],
+        "20": bearings[4],
+    }
 
 	results = {}
 	for i, p in enumerate(POINTS):
