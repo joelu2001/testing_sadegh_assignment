@@ -322,7 +322,7 @@ def compute(inputs):
 
     wrong_in_angle_by_point = {}
     for p in ANGLE_POINTS:
-        wrong_in_angle_by_point[p] = beta_adj_by_point[p] - beta_meas_by_point[p] - 200.0
+        wrong_in_angle_by_point[p] = beta_adj_by_point[p] - beta_meas_by_point[p]
 
     bearings = compute_bearings(phi_12, beta_adj)
     dN, dE = compute_increments(lengths, bearings)
