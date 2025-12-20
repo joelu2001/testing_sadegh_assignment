@@ -215,12 +215,6 @@
     const statusEl = document.getElementById("status");
     const plotEl = document.getElementById("plot");
 
-    document.getElementById("addRow").addEventListener("click", () => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td><input value="0"></td><td><input value="0"></td>`;
-      tbody.appendChild(tr);
-    });
-
     let pyodide = null;
 
     async function initPyodideAndPackages() {
