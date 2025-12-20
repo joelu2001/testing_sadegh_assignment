@@ -256,34 +256,38 @@ import math
 import matplotlib.pyplot as plt
 
 def plot_xy_to_base64(xs, ys):
-    fig, ax = plt.subplots(figsize=(4, 4), dpi=150)
+    fig, ax = plt.subplots(figsize=(3.8, 3.8), dpi=150)
 
     ax.plot(xs, ys, marker="o", linestyle="-")
 
-    # Label points 20–24 (ignore closing point)
+    # Label points 20–24 (ignore closing point if present)
     labels = ["20", "21", "22", "23", "24"]
-    for i, lbl in enumerate(labels):
-        ax.text(
-            xs[i],
-            ys[i],
-            lbl,
-            fontsize=9,
+    n = min(5, len(xs), len(ys))
+
+    for i in range(n):
+        ax.annotate(
+            labels[i],
+            (xs[i], ys[i]),
+            textcoords="offset points",
+            xytext=(10, 10),   # further away from the marker
             ha="left",
-            va="bottom"
+            va="bottom",
+            fontsize=9,
         )
 
     ax.set_xlabel("E")
     ax.set_ylabel("N")
     ax.set_aspect("equal", adjustable="box")
 
-    # Force origin toward lower-left
-    pad = 0.05 * max(
-        max(xs) - min(xs),
-        max(ys) - min(ys),
-        1.0
-    )
-    ax.set_xlim(min(xs) - pad, max(xs) + pad)
-    ax.set_ylim(min(ys) - pad, max(ys) + pad)
+    # Make sure origin is in view and sits toward lower-left
+    min_x, max_x = min(xs), max(xs)
+    min_y, max_y = min(ys), max(ys)
+
+    span = max(max_x - min_x, max_y - min_y, 1.0)
+    pad = 0.10 * span
+
+    ax.set_xlim(min(0.0, min_x) - pad, max_x + pad)
+    ax.set_ylim(min(0.0, min_y) - pad, max_y + pad)
 
     ax.grid(True, which="major")
     ax.minorticks_on()
