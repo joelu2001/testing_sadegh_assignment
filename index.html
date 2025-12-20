@@ -34,7 +34,7 @@
 
   #dataTable th{font-size:0.8rem;}
   #dataTable td{font-size:0.85rem;}
-  #dataTable tbody tr{height:30px;}
+  #dataTable tbody tr{height:25px;}
 
   #dataTable input[type="number"]{
     width:100%;
@@ -53,16 +53,18 @@
 <body>
   <div class="wrap">
     <div class="left">
-      <h2>Inputs</h2>
+	<div class="author-note">
+		Created by Joel Utsi
+	</div>
+      <h2>Traverse protocol</h2>
 
       <div class="row">
-        <button id="addRow">Add row</button>
-        <button id="plotBtn" disabled>Plot</button>
+        <button id="plotBtn" disabled>Do calculation</button>
         <span id="status">Loading Python…</span>
       </div>
 
       <p class="hint">
-        Enter numeric x/y values. The plot will draw points and connect them in row order.
+        Enter values for your observations below, then press "Do calculation".
       </p>
 		<table id="dataTable">
 		  <thead>
@@ -198,8 +200,8 @@
     </div>
 
     <div class="right">
-      <h2>Plot</h2>
-      <div id="plot"><div class="hint">Fill in the table in the left panel.</div></div>
+      <h2>Closed traverse</h2>
+      <div id="plot"><div class="hint">Fill in the traverse protocol to the left.</div></div>
     </div>
   </div>
 
@@ -247,7 +249,10 @@ def plot_xy_to_base64(xs, ys):
     ax.set_ylabel("N")
 
     ax.set_aspect("equal", adjustable="box")
-    ax.grid(True)
+
+    ax.grid(True, which="major")
+    ax.minorticks_on()
+    ax.grid(True, which="minor", alpha=0.3)
 
     buf = BytesIO()
     fig.tight_layout()
