@@ -193,15 +193,6 @@
 			  <td class="bg-blue"><input class="out" data-out="wrong_in_E" data-point="20" readonly></td>
 			</tr>
 			
-			<tr>
-			  <td></td>
-			  <td><input class="out" data-out="bearing" data-point="20" readonly></td>
-			  <td></td>
-			  <td></td>
-			  <td></td>
-			  <td></td>
-			  <td></td>
-			</tr>
 		  </tbody>
 		</table>
     </div>
@@ -262,10 +253,9 @@
       pyodide.runPython(`
 import base64
 from io import BytesIO
-
 import matplotlib
 matplotlib.use("Agg")  # render offscreen to PNG
-
+import math
 import matplotlib.pyplot as plt
 
 def plot_xy_to_base64(xs, ys):
@@ -281,34 +271,163 @@ def plot_xy_to_base64(xs, ys):
     plt.close(fig)
     buf.seek(0)
     return base64.b64encode(buf.read()).decode("utf-8")
-      `);
+
+POINTS = ["20", "21", "22", "23", "24"]
+
+def gon_to_rad(g):
+    return g * math.pi / 200.0
+
+def _get(inputs, point, key):
+    v = (inputs.get(point, {}) or {}).get(key, None)
+    return float(v) if v is not None else None
+
+def adjust_angles(beta_measured):
+    f_beta = 400.0 - sum(beta_measured)
+    d_beta = f_beta / 5.0
+    beta_adj = [b + d_beta + 200.0 for b in beta_measured]
+    return beta_adj, f_beta
+
+def compute_bearings(phi_12, adjusted_angles):
+    phi = [0.0] * 5
+    phi[0] = phi_12
+    for i in range(1, 5):
+        phi[i] = (phi[i - 1] + adjusted_angles[i - 1] - 200.0) % 400.0
+    return phi
+
+def compute_increments(lengths, bearings):
+    dN, dE = [], []
+    for i in range(5):
+        L = lengths[i]
+        phi = gon_to_rad(bearings[i])
+        dN.append(L * math.cos(phi))
+        dE.append(L * math.sin(phi))
+    return dN, dE
+
+def compute_coordinate_errors(dN, dE):
+    fN = -sum(dN)
+    fE = -sum(dE)
+    fR = math.sqrt(fN**2 + fE**2)
+    return fN, fE, fR
+
+def compute_Bowditch(fN, fE, lengths):
+    total_length = sum(lengths)
+    cor_N = [L * fN / total_length for L in lengths]
+    cor_E = [L * fE / total_length for L in lengths]
+    return cor_N, cor_E, total_length
+
+def compute_coordinates(first_N, first_E, dN, dE, cor_N, cor_E):
+    coordinates = []
+    for i in range(5):
+        N = first_N + sum(dN[:i]) + sum(cor_N[:i])
+        E = first_E + sum(dE[:i]) + sum(cor_E[:i])
+        coordinates.append((N, E))
+    return coordinates
+
+def compute(inputs):
+    first_N = _get(inputs, "20", "N")
+    first_E = _get(inputs, "20", "E")
+    phi_12  = _get(inputs, "21", "bearing")
+
+    beta_measured = [_get(inputs, p, "measured_angle") for p in POINTS]
+    lengths       = [_get(inputs, p, "side_length") for p in POINTS]
+
+    if any(v is None for v in [first_N, first_E, phi_12] + beta_measured + lengths):
+        return {}
+
+    beta_adj, f_beta = adjust_angles(beta_measured)
+    bearings = compute_bearings(phi_12, beta_adj)
+    dN, dE = compute_increments(lengths, bearings)
+    fN, fE, fR = compute_coordinate_errors(dN, dE)
+    cor_N, cor_E, total_L = compute_Bowditch(fN, fE, lengths)
+    coords = compute_coordinates(first_N, first_E, dN, dE, cor_N, cor_E)
+
+    results = {}
+    for i, p in enumerate(POINTS):
+        results[p] = {
+            "dN": dN[i],
+            "dE": dE[i],
+            "bearing": bearings[i],
+            "N": coords[i][0],
+            "E": coords[i][1],
+            "wrong_in_N": cor_N[i],
+            "wrong_in_E": cor_E[i],
+            "wrong_in_angle": beta_adj[i],
+        }
+
+    results["_global"] = {
+        "f_beta": f_beta,
+        "fN": fN,
+        "fE": fE,
+        "fR": fR,
+        "total_length": total_L,
+    }
+
+    return results
+`);
 
       statusEl.textContent = "Ready.";
       plotBtn.disabled = false;
     }
 
-    async function doPlot() {
-      try {
-        plotBtn.disabled = true;
-        statusEl.textContent = "Plotting…";
+	async function doPlot() {
+	  try {
+		plotBtn.disabled = true;
+		statusEl.textContent = "Plotting…";
 
-        const { xs, ys } = readTableXY();
+		const inputs = collectInputs();
 
-        // Pass JS arrays to Python
-        pyodide.globals.set("xs_js", pyodide.toPy(xs));
-        pyodide.globals.set("ys_js", pyodide.toPy(ys));
+		pyodide.globals.set("inputs", pyodide.toPy(inputs));
+		const results = pyodide.runPython("compute(inputs)").toJs();
 
-        const b64 = pyodide.runPython(`plot_xy_to_base64(xs_js, ys_js)`);
+		clearOutputs();
+		fillOutputs(results);
 
-        plotEl.innerHTML = `<img alt="matplotlib plot" src="data:image/png;base64,${b64}">`;
-        statusEl.textContent = "Done.";
-      } catch (err) {
-        plotEl.innerHTML = `<div class="hint" style="color: #b00020;">${err.message}</div>`;
-        statusEl.textContent = "Error.";
-      } finally {
-        plotBtn.disabled = false;
-      }
-    }
+		// ... keep your plotting code here if you already have it ...
+
+		statusEl.textContent = "Done.";
+	  } catch (err) {
+		statusEl.textContent = "Error.";
+		plotEl.innerHTML = `<div class="hint" style="color:#b00020;">${err.message}</div>`;
+	  } finally {
+		plotBtn.disabled = false;
+	  }
+	}
+	
+	function collectInputs() {
+	  const inputs = {};
+	  document.querySelectorAll('#dataTable input[data-in]').forEach(el => {
+		const point = el.dataset.point;
+		const key = el.dataset.in;
+
+		const raw = el.value.trim();
+		const val = raw === "" ? null : Number(raw);
+
+		if (!inputs[point]) inputs[point] = {};
+		inputs[point][key] = Number.isFinite(val) ? val : null;
+	  });
+	  return inputs;
+	}
+
+	function clearOutputs() {
+	  document.querySelectorAll('#dataTable input.out[data-out]').forEach(el => {
+		el.value = "";
+	  });
+	}
+
+	function fillOutputs(results) {
+	  document.querySelectorAll('#dataTable input.out[data-out]').forEach(el => {
+		const point = el.dataset.point;
+		const key = el.dataset.out;
+
+		const pointObj = results?.[point];
+		if (!pointObj) return;
+
+		const v = pointObj[key];
+		if (v === undefined || v === null) return;
+
+		el.value = (typeof v === "number") ? v.toFixed(4) : String(v);
+	  });
+	}
 
     plotBtn.addEventListener("click", doPlot);
 
