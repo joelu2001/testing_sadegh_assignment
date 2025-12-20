@@ -338,13 +338,24 @@ def compute(inputs):
     if any(v is None for v in [first_N, first_E, phi_12] + beta_measured + lengths):
         return {}
 
-    beta_adj, f_beta = adjust_angles(beta_measured)
-    beta_adj_by_point = dict(zip(ANGLE_POINTS, beta_adj))
+    angles = [[0.0, 0.0, 0.0, b] for b in beta_measured]
+
+    beta_adj = adjust_angles(angles)
+
+    f_beta = 400.0 - sum(beta_measured)
+
+    wrong_in_angle_by_point = {
+        p: (beta_adj[i] - beta_measured[i]) for i, p in enumerate(ANGLE_POINTS)
+    }
 
     bearings = compute_bearings(phi_12, beta_adj)
-    dN, dE = compute_increments(lengths, bearings)
+
+    dN, dE = compute_increments([[0.0, 0.0, L] for L in lengths], bearings)
+
     fN, fE, fR = compute_coordinate_errors(dN, dE)
-    cor_N, cor_E, total_L = compute_Bowditch(fN, fE, lengths)
+
+    cor_N, cor_E, total_L = compute_Bowditch(fN, fE, [[0.0, 0.0, L] for L in lengths])
+
     coords = compute_coordinates(first_N, first_E, dN, dE, cor_N, cor_E)
 
     bearing_incoming = {
@@ -395,11 +406,8 @@ def compute(inputs):
         "24": (coords[4][0], coords[4][1]),
     }
 
-    wrong_in_angle_by_point = {}
-    for p in ANGLE_POINTS:
-        wrong_in_angle_by_point[p] = beta_adj_by_point[p] - 200.0
-
     results = {}
+
     for p in POINTS:
         results[p] = {
             "dN": dN_incoming[p],
