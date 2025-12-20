@@ -218,26 +218,6 @@
       tbody.appendChild(tr);
     });
 
-    function readTableXY() {
-      const rows = [...tbody.querySelectorAll("tr")];
-      const xs = [];
-      const ys = [];
-
-      for (const row of rows) {
-        const inputs = row.querySelectorAll("input");
-        const x = Number(inputs[0].value);
-        const y = Number(inputs[1].value);
-
-        if (!Number.isFinite(x) || !Number.isFinite(y)) {
-          throw new Error("All table cells must be valid numbers.");
-        }
-        xs.push(x);
-        ys.push(y);
-      }
-      if (xs.length < 1) throw new Error("Add at least one row.");
-      return { xs, ys };
-    }
-
     let pyodide = null;
 
     async function initPyodideAndPackages() {
@@ -341,18 +321,26 @@ def compute(inputs):
     cor_N, cor_E, total_L = compute_Bowditch(fN, fE, lengths)
     coords = compute_coordinates(first_N, first_E, dN, dE, cor_N, cor_E)
 
-    results = {}
-    for i, p in enumerate(POINTS):
-        results[p] = {
-            "dN": dN[i],
-            "dE": dE[i],
-            "bearing": bearings[i],
-            "N": coords[i][0],
-            "E": coords[i][1],
-            "wrong_in_N": cor_N[i],
-            "wrong_in_E": cor_E[i],
-            "wrong_in_angle": beta_adj[i],
-        }
+	bearing_incoming = {
+		"21": bearings[0],
+		"22": bearings[1],
+		"23": bearings[2],
+		"24": bearings[3],
+		"20": bearings[4],
+	}
+
+	results = {}
+	for i, p in enumerate(POINTS):
+		results[p] = {
+			"dN": dN[i],
+			"dE": dE[i],
+			"bearing": bearing_incoming[p],
+			"N": coords[i][0],
+			"E": coords[i][1],
+			"wrong_in_N": cor_N[i],
+			"wrong_in_E": cor_E[i],
+			"wrong_in_angle": beta_adj[i],
+		}
 
     results["_global"] = {
         "f_beta": f_beta,
