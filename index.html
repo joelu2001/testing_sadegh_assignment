@@ -331,25 +331,27 @@ def compute(inputs):
     phi_12 = _get(inputs, "21", "bearing")
 
     ANGLE_POINTS = ["21", "22", "23", "24", "20"]
-    beta = [_get(inputs, p, "measured_angle") for p in ANGLE_POINTS]
-    L = [_get(inputs, p, "side_length") for p in POINTS]
+    LEG_POINTS = ["20", "21", "22", "23", "24"]
 
-    if any(v is None for v in [first_N, first_E, phi_12] + beta + L):
+    beta_measured = [_get(inputs, p, "measured_angle") for p in ANGLE_POINTS]
+    leg_lengths = [_get(inputs, p, "side_length") for p in LEG_POINTS]
+
+    if any(v is None for v in [first_N, first_E, phi_12] + beta_measured + leg_lengths):
         return {}
 
-    angles_struct = [[0.0, 0.0, 0.0, b] for b in beta]
-    lengths_struct = [[0.0, 0.0, l] for l in L]
+    angles = [[0.0, 0.0, 0.0, b] for b in beta_measured]
+    lengths = [[0.0, 0.0, L] for L in leg_lengths]
 
-    f_beta = 400.0 - sum(beta)
+    adjusted_angles = adjust_angles(angles)
+
+    f_beta = 400.0 - sum(beta_measured)
     d_beta = f_beta / 5.0
-
-    adjusted_angles = adjust_angles(angles_struct)
+    wrong_in_angle_by_point = {p: d_beta for p in ANGLE_POINTS}
 
     bearings = compute_bearings(phi_12, adjusted_angles)
-    dN, dE = compute_increments(lengths_struct, bearings)
-
+    dN, dE = compute_increments(lengths, bearings)
     fN, fE, fR = compute_coordinate_errors(dN, dE)
-    cor_N, cor_E, total_L = compute_Bowditch(fN, fE, lengths_struct)
+    cor_N, cor_E, total_L = compute_Bowditch(fN, fE, lengths)
     coords = compute_coordinates(first_N, first_E, dN, dE, cor_N, cor_E)
 
     bearing_incoming = {
@@ -392,9 +394,6 @@ def compute(inputs):
         "20": cor_E[4],
     }
 
-    beta_by_point = dict(zip(ANGLE_POINTS, beta))
-    wrong_in_angle_by_point = {p: d_beta for p in ANGLE_POINTS}
-
     coord_by_point = {
         "20": (coords[0][0], coords[0][1]),
         "21": (coords[1][0], coords[1][1]),
@@ -404,11 +403,12 @@ def compute(inputs):
     }
 
     results = {}
+
     for p in POINTS:
         results[p] = {
+            "bearing": bearing_incoming[p],
             "dN": dN_incoming[p],
             "dE": dE_incoming[p],
-            "bearing": bearing_incoming[p],
             "N": coord_by_point[p][0],
             "E": coord_by_point[p][1],
             "wrong_in_N": corN_incoming[p],
