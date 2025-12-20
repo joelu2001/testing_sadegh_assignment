@@ -409,6 +409,16 @@ def compute(inputs):
 	async function doPlot() {
 	  try {
 		plotBtn.disabled = true;
+		
+		if (!allObservationsFilled()) {
+		  plotEl.innerHTML =
+			`<div class="hint" style="color:#fca5a5;">
+			  You must fill in all empty observations!
+			</div>`;
+		  statusEl.textContent = "Missing inputs.";
+		  return;
+		}
+
 		statusEl.textContent = "Computing + plotting…";
 
 		const inputs = collectInputs();
@@ -481,6 +491,16 @@ def compute(inputs):
 
 		el.value = (typeof v === "number") ? v.toFixed(4) : String(v);
 	  });
+	}
+	
+	function allObservationsFilled() {
+	  const inputs = document.querySelectorAll('#dataTable input[data-in]');
+	  for (const el of inputs) {
+		if (el.value.trim() === "" || !Number.isFinite(Number(el.value))) {
+		  return false;
+		}
+	  }
+	  return true;
 	}
 
     plotBtn.addEventListener("click", doPlot);
