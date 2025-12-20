@@ -338,12 +338,7 @@ def compute(inputs):
     if any(v is None for v in [first_N, first_E, phi_12] + beta_measured + lengths):
         return {}
 
-    angles = [[None, None, None, b] for b in beta_measured]
-    beta_adj = adjust_angles(angles)
-
-    f_beta = 400.0 - sum(beta_measured)
-    d_beta = f_beta / 5.0
-
+    beta_adj, f_beta = adjust_angles(beta_measured)
     beta_adj_by_point = dict(zip(ANGLE_POINTS, beta_adj))
 
     bearings = compute_bearings(phi_12, beta_adj)
@@ -352,11 +347,45 @@ def compute(inputs):
     cor_N, cor_E, total_L = compute_Bowditch(fN, fE, lengths)
     coords = compute_coordinates(first_N, first_E, dN, dE, cor_N, cor_E)
 
-    bearing_incoming = {"21": bearings[0], "22": bearings[1], "23": bearings[2], "24": bearings[3], "20": bearings[4]}
-    dN_incoming = {"21": dN[0], "22": dN[1], "23": dN[2], "24": dN[3], "20": dN[4]}
-    dE_incoming = {"21": dE[0], "22": dE[1], "23": dE[2], "24": dE[3], "20": dE[4]}
-    corN_incoming = {"21": cor_N[0], "22": cor_N[1], "23": cor_N[2], "24": cor_N[3], "20": cor_N[4]}
-    corE_incoming = {"21": cor_E[0], "22": cor_E[1], "23": cor_E[2], "24": cor_E[3], "20": cor_E[4]}
+    bearing_incoming = {
+        "21": bearings[0],
+        "22": bearings[1],
+        "23": bearings[2],
+        "24": bearings[3],
+        "20": bearings[4],
+    }
+
+    dN_incoming = {
+        "21": dN[0],
+        "22": dN[1],
+        "23": dN[2],
+        "24": dN[3],
+        "20": dN[4],
+    }
+
+    dE_incoming = {
+        "21": dE[0],
+        "22": dE[1],
+        "23": dE[2],
+        "24": dE[3],
+        "20": dE[4],
+    }
+
+    corN_incoming = {
+        "21": cor_N[0],
+        "22": cor_N[1],
+        "23": cor_N[2],
+        "24": cor_N[3],
+        "20": cor_N[4],
+    }
+
+    corE_incoming = {
+        "21": cor_E[0],
+        "22": cor_E[1],
+        "23": cor_E[2],
+        "24": cor_E[3],
+        "20": cor_E[4],
+    }
 
     coord_by_point = {
         "20": (coords[0][0], coords[0][1]),
@@ -365,6 +394,10 @@ def compute(inputs):
         "23": (coords[3][0], coords[3][1]),
         "24": (coords[4][0], coords[4][1]),
     }
+
+    wrong_in_angle_by_point = {}
+    for p in ANGLE_POINTS:
+        wrong_in_angle_by_point[p] = beta_adj_by_point[p] - 200.0
 
     results = {}
     for p in POINTS:
@@ -376,7 +409,7 @@ def compute(inputs):
             "E": coord_by_point[p][1],
             "wrong_in_N": corN_incoming[p],
             "wrong_in_E": corE_incoming[p],
-            "wrong_in_angle": d_beta,
+            "wrong_in_angle": wrong_in_angle_by_point[p],
         }
 
     results["_global"] = {
