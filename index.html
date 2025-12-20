@@ -306,10 +306,10 @@ def compute_coordinates(first_N, first_E, dN, dE, cor_N, cor_E):
 def compute(inputs):
     first_N = _get(inputs, "20", "N")
     first_E = _get(inputs, "20", "E")
-    phi_12  = _get(inputs, "21", "bearing")
+    phi_12 = _get(inputs, "21", "bearing")
 
     beta_measured = [_get(inputs, p, "measured_angle") for p in POINTS]
-    lengths       = [_get(inputs, p, "side_length") for p in POINTS]
+    lengths = [_get(inputs, p, "side_length") for p in POINTS]
 
     if any(v is None for v in [first_N, first_E, phi_12] + beta_measured + lengths):
         return {}
@@ -329,18 +329,19 @@ def compute(inputs):
         "20": bearings[4],
     }
 
-	results = {}
-	for i, p in enumerate(POINTS):
-		results[p] = {
-			"dN": dN[i],
-			"dE": dE[i],
-			"bearing": bearing_incoming[p],
-			"N": coords[i][0],
-			"E": coords[i][1],
-			"wrong_in_N": cor_N[i],
-			"wrong_in_E": cor_E[i],
-			"wrong_in_angle": beta_adj[i],
-		}
+    results = {}
+
+    for i, p in enumerate(POINTS):
+        results[p] = {
+            "dN": dN[i],
+            "dE": dE[i],
+            "bearing": bearing_incoming[p],
+            "N": coords[i][0],
+            "E": coords[i][1],
+            "wrong_in_N": cor_N[i],
+            "wrong_in_E": cor_E[i],
+            "wrong_in_angle": beta_adj[i],
+        }
 
     results["_global"] = {
         "f_beta": f_beta,
@@ -351,6 +352,7 @@ def compute(inputs):
     }
 
     return results
+
 `);
 
       statusEl.textContent = "Ready.";
