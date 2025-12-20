@@ -196,7 +196,24 @@
 			  <td></td>
 			  <td class="bg-blue"><input class="out" data-out="wrong_in_E" data-point="20" readonly></td>
 			</tr>
-			
+		  </tbody>
+		  <thead>
+			<tr>
+			  <th>f<sub>β</sub></th>
+			  <th>f<sub>N</sub></th>
+			  <th>f<sub>E</sub></th>
+			  <th>f<sub>r</sub></th>
+			  <th>f<sub>Σ</sub></th>
+			</tr>
+		  </thead>
+		  <tbody>
+			  <tr>
+				  <td><input class="out" data-out="f_beta" readonly></td>
+				  <td><input class="out" data-out="fN" readonly></td>
+				  <td><input class="out" data-out="fE" readonly></td>
+				  <td><input class="out" data-out="fR" readonly></td>
+				  <td><input class="out" data-out="total_length" readonly></td>
+				</tr>
 		  </tbody>
 		</table>
     </div>
@@ -481,19 +498,25 @@ def compute(inputs):
 
 	function fillOutputs(results) {
 	  document.querySelectorAll('#dataTable input.out[data-out]').forEach(el => {
-		const point = el.dataset.point;
 		const key = el.dataset.out;
+		const point = el.dataset.point;
 
-		const pointObj = results?.[point];
-		if (!pointObj) return;
+		let value = null;
 
-		const v = pointObj[key];
-		if (v === undefined || v === null) return;
+		if (point) {
+		  value = results?.[point]?.[key];
+		} else {
+		  value = results?._global?.[key];
+		}
 
-		el.value = (typeof v === "number") ? v.toFixed(4) : String(v);
+		if (value === undefined || value === null) return;
+
+		el.value = (typeof value === "number")
+		  ? value.toFixed(4)
+		  : String(value);
 	  });
 	}
-	
+
 	function allObservationsFilled() {
 	  const inputs = document.querySelectorAll('#dataTable input[data-in]');
 	  for (const el of inputs) {
