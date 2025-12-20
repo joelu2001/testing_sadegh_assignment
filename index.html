@@ -256,7 +256,7 @@ import math
 import matplotlib.pyplot as plt
 
 def plot_xy_to_base64(xs, ys):
-    fig, ax = plt.subplots(figsize=(3.8, 3.8), dpi=150)
+    fig, ax = plt.subplots(figsize=(5, 5), dpi=150)
 
     ax.plot(xs, ys, marker="o", linestyle="-")
 
@@ -269,7 +269,7 @@ def plot_xy_to_base64(xs, ys):
             labels[i],
             (xs[i], ys[i]),
             textcoords="offset points",
-            xytext=(10, 10),   # further away from the marker
+            xytext=(5, 5),
             ha="left",
             va="bottom",
             fontsize=9,
