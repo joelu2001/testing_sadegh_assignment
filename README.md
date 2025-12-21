@@ -1,1 +1,3 @@
 # testing_sadegh_assignment
+
+This project is part of the Geodetic Surveying (VGMF15, VGMA05, EXTA50) courses at LTH and Helsingborg Campus. This repository stores the HTML code for the GitHub Pages website found at this URL: https://joelu2001.github.io/testing_sadegh_assignment/. The website consists of a Traverse Protocol on the left panel, and a Closed Traverse on the right panel. The user has the ability to fill in observed measurements in specific boxes, calculate the results which fills the remaining empty boxes and creates a closed traverse graph.
