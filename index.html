@@ -51,6 +51,9 @@
   #dataTable td.bg-blue input,#dataTable td.bg-green input{background:transparent;}
   
   #dataTable input {text-align: center;}
+  
+  @keyframes flashRed {0% { background-color: rgba(239, 68, 68, 0.25); }100% { background-color: transparent; }}
+  .flash-missing {animation: flashRed 350ms ease-out;}
 </style>
 
 </head>
@@ -468,6 +471,9 @@ def compute(inputs):
 		plotBtn.disabled = true;
 		
 		if (!allObservationsFilled()) {
+		  flashMissingInputs();
+		  clearFlashClassAfter();
+
 		  plotEl.innerHTML =
 			`<div class="hint" style="color:#fca5a5;">
 			  You must fill in all empty observations!
@@ -564,6 +570,30 @@ def compute(inputs):
 		}
 	  }
 	  return true;
+	}
+	
+	function flashMissingInputs() {
+	  const inputs = document.querySelectorAll('#dataTable input[data-in]');
+	  for (const el of inputs) {
+		const v = el.value.trim();
+		const ok = v !== "" && Number.isFinite(Number(v));
+
+		if (!ok) {
+		  // remove first so animation can retrigger on repeated clicks
+		  el.classList.remove("flash-missing");
+		  // force reflow
+		  void el.offsetWidth;
+		  el.classList.add("flash-missing");
+		}
+	  }
+	}
+
+	function clearFlashClassAfter() {
+	  // clean up after animation ends (optional but tidy)
+	  setTimeout(() => {
+		document.querySelectorAll('#dataTable input.flash-missing')
+		  .forEach(el => el.classList.remove('flash-missing'));
+	  }, 450);
 	}
 
     plotBtn.addEventListener("click", doPlot);
