@@ -201,6 +201,15 @@
 			  <td class="bg-blue"><input class="out" data-out="repeated_20" data-point="E" readonly></td>
 			  <td class="bg-blue"><input class="out" data-out="wrong_in_E" data-point="20" readonly></td>
 			</tr>
+
+			<tr>
+			  <td></td>
+			  <td><input class="out" data-out="last_bearing" data-point="last" readonly></td>
+			  <td></td>
+			  <td></td>
+			  <td></td>
+			  <td></td>
+			</tr>
 		  </tbody>
 		  <thead>
 			<tr>
@@ -450,6 +459,7 @@ def compute(inputs):
             "wrong_in_E": corE_incoming[p],
             "wrong_in_angle": wrong_in_angle_by_point[p],
 			"repeated_20": {"N": first_N, "E": first_E}
+			"last_bearing": {"last": phi_12 - f_beta}
         }
 
     results["_global"] = {
