@@ -61,17 +61,17 @@
   <div class="wrap">
     <div class="left">
 	<div class="author-note">
-		Created by Joel Utsi & Sadegh Jamali
+		Utvecklat av Joel Utsi & Sadegh Jamali
 	</div>
-      <h2>Traverse protocol</h2>
+      <h2>Traversprotokoll</h2>
 
       <div class="row">
-        <button id="plotBtn" disabled>Do calculation</button>
-        <span id="status">Loading Python…</span>
+        <button id="plotBtn" disabled>Utför beräkning</button>
+        <span id="status">Laddar Python…</span>
       </div>
 
       <p class="hint">
-        Enter values for your observations below, then press "Do calculation".
+        Fyll i värden för observationer nedan, tryck därefter på "Utför beräkning".
       </p>
 		<table id="dataTable">
 		  <thead>
@@ -224,8 +224,8 @@
     </div>
 
     <div class="right">
-      <h2>Closed traverse</h2>
-      <div id="plot"><div class="hint">Fill in the traverse protocol to the left.</div></div>
+      <h2>Stängd traverse</h2>
+      <div id="plot"><div class="hint">Fyll i traversprotokollet till vänster först!</div></div>
     </div>
   </div>
 
@@ -462,7 +462,7 @@ def compute(inputs):
     return results
 `);
 
-      statusEl.textContent = "Ready.";
+      statusEl.textContent = "Redo.";
       plotBtn.disabled = false;
     }
 
@@ -478,11 +478,11 @@ def compute(inputs):
 			`<div class="hint" style="color:#fca5a5;">
 			  You must fill in all empty observations!
 			</div>`;
-		  statusEl.textContent = "Missing inputs.";
+		  statusEl.textContent = "Saknar data.";
 		  return;
 		}
 
-		statusEl.textContent = "Computing + plotting…";
+		statusEl.textContent = "Beräknar + plottar...";
 
 		const inputs = collectInputs();
 
@@ -499,7 +499,7 @@ def compute(inputs):
 		for (const p of order) {
 		  const pt = results?.[p];
 		  if (!pt || pt.E === undefined || pt.N === undefined || pt.E === null || pt.N === null) {
-			throw new Error(`Missing computed N/E for point ${p}.`);
+			throw new Error(`Saknar N/E för punkt ${p}.`);
 		  }
 		  xs.push(Number(pt.E)); 
 		  ys.push(Number(pt.N)); 
@@ -511,9 +511,9 @@ def compute(inputs):
 
 		plotEl.innerHTML = `<img alt="Traverse plot" src="data:image/png;base64,${b64}">`;
 
-		statusEl.textContent = "Done.";
+		statusEl.textContent = "Klar.";
 	  } catch (err) {
-		statusEl.textContent = "Error.";
+		statusEl.textContent = "Fel.";
 		plotEl.innerHTML = `<div class="hint" style="color:#b00020;">${err.message || err}</div>`;
 	  } finally {
 		plotBtn.disabled = false;
@@ -600,7 +600,7 @@ def compute(inputs):
 
     // Kick off initialization
     initPyodideAndPackages().catch((err) => {
-      statusEl.textContent = "Failed to load Python.";
+      statusEl.textContent = "Lyckades inte ladda Python.";
       plotEl.innerHTML = `<div class="hint" style="color: #b00020;">${err.message}</div>`;
     });
   </script>
