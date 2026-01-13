@@ -204,7 +204,7 @@
 
 			<tr>
 			  <td></td>
-			  <td><input class="out" data-out="last_bearing" readonly></td>
+			  <td><input class="out" data-out="last_bearing" data-format="parens" readonly></td>
 			  <td></td>
 			  <td></td>
 			  <td></td>
@@ -568,9 +568,13 @@ def compute(inputs):
 
 		if (value === undefined || value === null) return;
 
-		el.value = (typeof value === "number")
-		  ? value.toFixed(4)
-		  : String(value);
+		let displayValue = typeof value === "number" ? value.toFixed(4) : String(value);
+
+		if (el.dataset.format === "parens") {
+		displayValue = `(${displayValue})`;
+		}
+
+		el.value = displayValue;
 	  });
 	}
 
