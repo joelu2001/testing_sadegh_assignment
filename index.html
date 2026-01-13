@@ -197,8 +197,8 @@
 			  <td class="bg-green"><input type="number" data-in="measured_angle" data-point="20"></td>
 			  <td><input class="out" data-out="wrong_in_angle" data-point="20" readonly></td>
 			  <td></td>
-			  <td></td>
-			  <td></td>
+			  <td class="bg-blue"><input class="out" data-out="repeated_20" data-point="N" readonly></td>
+			  <td class="bg-blue"><input class="out" data-out="repeated_20" data-point="E" readonly></td>
 			  <td class="bg-blue"><input class="out" data-out="wrong_in_E" data-point="20" readonly></td>
 			</tr>
 		  </tbody>
@@ -449,6 +449,7 @@ def compute(inputs):
             "wrong_in_N": corN_incoming[p],
             "wrong_in_E": corE_incoming[p],
             "wrong_in_angle": wrong_in_angle_by_point[p],
+			"repeated_20": {"N": first_N, "E": first_E}
         }
 
     results["_global"] = {
