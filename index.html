@@ -207,8 +207,8 @@
 			  <td><input class="out" data-out="last_bearing" data-format="parens" readonly></td>
 			  <td></td>
 			  <td></td>
-			  <td></td>
-			  <td></td>
+			  <td><input class="out" data-out="last_E" data-format="parens" readonly></td>
+			  <td><input class="out" data-out="last_N" data-format="parens" readonly></td>
 			</tr>
 		  </tbody>
 		  <thead>
@@ -468,7 +468,9 @@ def compute(inputs):
         "fE": fE,
         "fR": fR,
         "total_length": total_L,
-		"last_bearing": phi_12 - f_beta
+		"last_bearing": phi_12 - f_beta,
+		"last_N": first_N - fN,
+		"last_E": first_N - fE
     }
 
     return results
