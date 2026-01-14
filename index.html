@@ -39,6 +39,8 @@
   #dataTable tbody tr{height:25px;}
 
   #dataTable input{width:100%; box-sizing:border-box; height:2.2em; line-height:2.2em; text-align:center;}
+
+  #dataTable td.no-top-border {border-top: none;}
 	
   #dataTable td:first-child{font-weight:500;white-space:nowrap;}
   #dataTable .bg-blue{background:rgba(59,130,246,0.18);background-clip:padding-box;}
@@ -109,7 +111,7 @@
 			
 			<tr>
 			  <td rowspan="2">21</td>
-			  <td class="bg-blue"><input type="number" data-in="bearing" data-point="21"></td>
+			  <td class="no-top-border"><input type="number" data-in="bearing" data-point="21"></td>
 			  <td></td>
 			  <td class="bg-green"><input class="out" data-out="dN" data-point="21" readonly></td>
 			  <td class="bg-green"><input class="out" data-out="dE" data-point="21" readonly></td>
