@@ -42,6 +42,9 @@
 
   #dataTable td.no-top-border {border-top: none;}
   #dataTable td.no-bottom-border {border-bottom: none;}	
+  #dataTable td.no-left-border {border-left: none;}
+  #dataTable td.no-right-border {border-right: none;}
+  #dataTable td.align-bottom {vertical-align: bottom;}
 
   #dataTable td:first-child{font-weight:500;white-space:nowrap;}
   #dataTable .bg-blue{background:rgba(59,130,246,0.18);background-clip:padding-box;}
@@ -91,9 +94,9 @@
 			</tr>
 			<tr>
 			  <td rowspan="2">20</td>
-			  <td></td>
-			  <td></td>
-			  <td></td>
+			  <td class="no-right-border"></td>
+			  <td class="no-right-border no-left-border"></td>
+			  <td class="no-left-border"></td>
 			  <td class="bg-blue no-bottom-border"></td>
 			  <td class="bg-blue no-bottom-border"></td>
 			  <td class="bg-blue no-bottom-border"></td>
@@ -102,7 +105,7 @@
 			<tr>
 			  <td class="no-bottom-border"></td>
 			  <td class="no-bottom-border"></td>
-			  <td rowspan="2"><input type="number" data-in="side_length" data-point="20"></td>
+			  <td rowspan="2" class="align-bottom"><input type="number" data-in="side_length" data-point="20"></td>
 			  <td class="bg-blue no-top-border"><input type="number" data-in="N" data-point="20"></td>
 			  <td class="bg-blue no-top-border"><input type="number" data-in="E" data-point="20"></td>
 			  <td class="no-top-border"></td>
@@ -120,7 +123,7 @@
 			<tr>
 			  <td class="bg-green no-bottom-border"><input type="number" data-in="measured_angle" data-point="21"></td>
 			  <td class="no-bottom-border"><input class="out" data-out="wrong_in_angle" data-point="21" data-decimals="4" readonly></td>
-			  <td rowspan="2"><input type="number" data-in="side_length" data-point="21"></td>
+			  <td rowspan="2" class="align-bottom"><input type="number" data-in="side_length" data-point="21"></td>
 			  <td class="bg-blue no-top-border"><input class="out" data-out="N" data-point="21" readonly></td>
 			  <td class="bg-blue no-top-border"><input class="out" data-out="E" data-point="21" readonly></td>
 			  <td class="bg-blue no-top-border"><input class="out" data-out="wrong_in_E" data-point="21" data-decimals="4" readonly></td>
@@ -138,7 +141,7 @@
 			<tr>
 			  <td class="bg-green no-bottom-border"><input type="number" data-in="measured_angle" data-point="22"></td>
 			  <td class="no-bottom-border"><input class="out" data-out="wrong_in_angle" data-point="22" data-decimals="4" readonly></td>
-			  <td rowspan="2"><input type="number" data-in="side_length" data-point="22"></td>
+			  <td rowspan="2" class="align-bottom"><input type="number" data-in="side_length" data-point="22"></td>
 			  <td class="bg-blue no-top-border"><input class="out" data-out="N" data-point="22" readonly></td>
 			  <td class="bg-blue no-top-border"><input class="out" data-out="E" data-point="22" readonly></td>
 			  <td class="bg-blue no-top-border"><input class="out" data-out="wrong_in_E" data-point="22" data-decimals="4" readonly></td>
@@ -156,7 +159,7 @@
 			<tr>
 			  <td class="bg-green no-bottom-border"><input type="number" data-in="measured_angle" data-point="23"></td>
 			  <td class="no-bottom-border"><input class="out" data-out="wrong_in_angle" data-point="23" data-decimals="4" readonly></td>
-			  <td rowspan="2"><input type="number" data-in="side_length" data-point="23"></td>
+			  <td rowspan="2" class="align-bottom"><input type="number" data-in="side_length" data-point="23"></td>
 			  <td class="bg-blue no-top-border"><input class="out" data-out="N" data-point="23" readonly></td>
 			  <td class="bg-blue no-top-border"><input class="out" data-out="E" data-point="23" readonly></td>
 			  <td class="bg-blue no-top-border"><input class="out" data-out="wrong_in_E" data-point="23" data-decimals="4" readonly></td>
@@ -174,7 +177,7 @@
 			<tr>
 			  <td class="bg-green no-bottom-border"><input type="number" data-in="measured_angle" data-point="24"></td>
 			  <td class="no-bottom-border"><input class="out" data-out="wrong_in_angle" data-point="24" data-decimals="4" readonly></td>
-			  <td rowspan="2"><input type="number" data-in="side_length" data-point="24"></td>
+			  <td rowspan="2" class="align-bottom"><input type="number" data-in="side_length" data-point="24"></td>
 			  <td class="bg-blue no-top-border"><input class="out" data-out="N" data-point="24" readonly></td>
 			  <td class="bg-blue no-top-border"><input class="out" data-out="E" data-point="24" readonly></td>
 			  <td class="bg-blue no-top-border"><input class="out" data-out="wrong_in_E" data-point="24" data-decimals="4" readonly></td>
@@ -209,12 +212,12 @@
 			</tr>
 
 			<tr>
-			  <td class="no-bottom-border">f<sub>β</sub></td>
+			  <td class="no-bottom-border">f<sub>β</sub>=</td>
 			  <td class="no-bottom-border"></td>
-			  <td class="no-bottom-border">Σ</td>
-			  <td class="no-bottom-border">f<sub>N</sub></td>
-			  <td class="no-bottom-border">f<sub>E</sub></td>
-			  <td class="no-bottom-border">f<sub>r</sub></td>
+			  <td class="no-bottom-border">Σ=</td>
+			  <td class="no-bottom-border">f<sub>N</sub>=</td>
+			  <td class="no-bottom-border">f<sub>E</sub>=</td>
+			  <td class="no-bottom-border">f<sub>r</sub>=</td>
 			</tr>
 
 			  <tr>
