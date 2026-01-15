@@ -23,7 +23,7 @@
   #plot img {max-width:100%;height:auto;display:block;}
   .hint {font-size:0.9rem;opacity:0.9;}
   
-  #dataTable{width:100%;table-layout:fixed;border-collapse:collapse;border-spacing:0;}
+  #dataTable{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;}
   #dataTable th,#dataTable td{
     padding:8px;
     vertical-align:middle;
@@ -72,7 +72,7 @@
         Fyll i värden för observationer nedan, tryck därefter på "Utför beräkning".
       </p>
 		<table id="dataTable">
-		  <thead>
+		  <tbody>
 			<tr>
 			  <th rowspan="2">Punkt</th>
 			  <th class="bg-green no-bottom-border">Mätt vinkel (gon)</th>
@@ -89,7 +89,6 @@
 			  <th class="bg-blue">E</th>
 			  <th class="bg-blue">Fel i E</th>
 			</tr>
-		  </thead>
 		  <tbody>
 			<tr>
 			  <td rowspan="2">20</td>
