@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Traversprotokoll</title>
+  <title>Polygontågsprotokoll</title>
 <style>
   body {margin:0;font-family:system-ui,Arial,sans-serif;background-color:#121212;color:#e0e0e0;}
   .wrap {display:flex;height:100vh;}
@@ -79,18 +79,18 @@
 			<tr>
 			  <td rowspan="2"><strong>Punkt</strong></td>
 			  <td class="bg-green no-bottom-border"><strong> Mätt vinkel (gon)</strong></td>
-			  <td class="no-bottom-border"> <strong>Fel i vinkel</strong></td>
+			  <td class="no-bottom-border"></td>
 			  <td rowspan="2"><strong>Sidlängd (m)</strong></td>
-			  <td class="bg-green no-bottom-border"><strong>ΔN</strong></td>
-			  <td class="bg-green no-bottom-border"><strong>ΔE</strong></td>
-			  <td class="bg-green no-bottom-border"><strong>Fel i N</strong></td>
+			  <td class="bg-green no-bottom-border"><strong>ΔN (m)</strong></td>
+			  <td class="bg-green no-bottom-border"><strong>ΔE (m)</strong></td>
+			  <td class="bg-green no-bottom-border"><strong>Fel i N (m)</strong></td>
 			</tr>
 			<tr>
 			  <td class="bg-blue no-top-border"><strong>Bäring (gon)</strong></td>
-			  <td class="no-top-border"></td>
-			  <td class="bg-blue no-top-border"><strong>N</strong></td>
-			  <td class="bg-blue no-top-border"><strong>E</strong></td>
-			  <td class="bg-blue no-top-border"><strong>Fel i E</strong></td>
+			  <td class="no-top-border"><strong>Fel i vinkel (gon)</strong></td>
+			  <td class="bg-blue no-top-border"><strong>N (m)</strong></td>
+			  <td class="bg-blue no-top-border"><strong>E (m)</strong></td>
+			  <td class="bg-blue no-top-border"><strong>Fel i E (m)</strong></td>
 			</tr>
 			<tr>
 			  <td rowspan="2">20</td>
@@ -221,7 +221,7 @@
 			</tr>
 
 			  <tr>
-				  <td class="no-top-border"><input class="out" data-out="f_beta" readonly></td>
+				  <td class="no-top-border"><input class="out" data-out="f_beta" data-decimals="4" readonly></td>
 				  <td class="no-top-border"></td>
 				  <td class="no-top-border"><input class="out"data-out="total_length" readonly></td>
 				  <td class="no-top-border"><input class="out" data-out="fN" readonly></td>
@@ -258,7 +258,6 @@
       statusEl.textContent = "Laddar matplotlib + numpy...";
       await pyodide.loadPackage(["numpy", "matplotlib"]);
 
-      // Define a Python helper that returns a base64 PNG string.
       pyodide.runPython(`
 import base64
 from io import BytesIO
@@ -538,7 +537,7 @@ def compute(inputs):
 		const point = el.dataset.point;
 		const key = el.dataset.in;
 
-		const raw = el.value.trim();
+		const raw = el.value.trim().replace(',', '.');
 		const val = raw === "" ? null : Number(raw);
 
 		if (!inputs[point]) inputs[point] = {};
@@ -580,25 +579,24 @@ def compute(inputs):
 	}
 
 	function allObservationsFilled() {
-	  const inputs = document.querySelectorAll('#dataTable input[data-in]');
-	  for (const el of inputs) {
-		if (el.value.trim() === "" || !Number.isFinite(Number(el.value))) {
-		  return false;
+		const inputs = document.querySelectorAll('#dataTable input[data-in]');
+		for (const el of inputs) {
+			const normalized = el.value.trim().replace(',', '.');  
+			if (normalized === "" || !Number.isFinite(Number(normalized))) {  
+			return false;
+			}
 		}
-	  }
-	  return true;
-	}
+		return true;
+		}
 	
 	function flashMissingInputs() {
 	  const inputs = document.querySelectorAll('#dataTable input[data-in]');
 	  for (const el of inputs) {
-		const v = el.value.trim();
+		const v = el.value.trim().replace(',', '.'); 
 		const ok = v !== "" && Number.isFinite(Number(v));
 
 		if (!ok) {
-		  // remove first so animation can retrigger on repeated clicks
 		  el.classList.remove("flash-missing");
-		  // force reflow
 		  void el.offsetWidth;
 		  el.classList.add("flash-missing");
 		}
@@ -606,7 +604,6 @@ def compute(inputs):
 	}
 
 	function clearFlashClassAfter() {
-	  // clean up after animation ends (optional but tidy)
 	  setTimeout(() => {
 		document.querySelectorAll('#dataTable input.flash-missing')
 		  .forEach(el => el.classList.remove('flash-missing'));
@@ -615,7 +612,6 @@ def compute(inputs):
 
     plotBtn.addEventListener("click", doPlot);
 
-    // Kick off initialization
     initPyodideAndPackages().catch((err) => {
       statusEl.textContent = "Lyckades inte ladda Python.";
       plotEl.innerHTML = `<div class="hint" style="color: #b00020;">${err.message}</div>`;
